@@ -2,6 +2,10 @@
 
 A Neovim plugin for intuitive window resizing. Resize windows in the direction you want them to grow or shrink, with intelligent neighbor detection.
 
+## Demo
+https://github.com/user-attachments/assets/cf57e9e7-6ea1-4383-ba3a-64bfe4ecbb96
+
+
 ## Features
 
 - **Directional resizing**: Resize windows in the direction that feels natural
