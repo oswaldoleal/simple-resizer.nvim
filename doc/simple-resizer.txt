@@ -1,0 +1,255 @@
+*simple-resizer.txt*  Simple window resizer for Neovim
+
+==============================================================================
+CONTENTS                                            *simple-resizer-contents*
+
+    1. Introduction ................... |simple-resizer-introduction|
+    2. Setup .......................... |simple-resizer-setup|
+    3. Configuration .................. |simple-resizer-configuration|
+    4. Functions ...................... |simple-resizer-functions|
+    5. Usage Examples ................. |simple-resizer-examples|
+    6. License ........................ |simple-resizer-license|
+
+==============================================================================
+1. INTRODUCTION                                 *simple-resizer-introduction*
+
+simple-resizer.nvim is a Neovim plugin for intuitive window resizing with
+intelligent neighbor detection. Resize windows in the direction you want them
+to grow or shrink.
+
+Features:
+  - Directional resizing that feels natural
+  - Smart neighbor detection
+  - Consistent behavior across different window layouts
+  - Simple Lua API
+
+==============================================================================
+2. SETUP                                              *simple-resizer-setup*
+
+Add the following to your configuration:
+>
+    require("simple-resizer").setup()
+    -- Default keybindings (Ctrl+Arrow keys) are automatically set up
+<
+
+Example with lazy.nvim:
+>
+    {
+      "oswaldoleal/simple-resizer.nvim",
+      config = function()
+        require("simple-resizer").setup()
+      end,
+    }
+<
+
+For lazy-loading on keys with lazy.nvim:
+>
+    {
+      "oswaldoleal/simple-resizer.nvim",
+      keys = {
+        { "<C-Left>", function() require("simple-resizer").resize_left() end },
+        { "<C-Right>", function() require("simple-resizer").resize_right() end },
+        { "<C-Up>", function() require("simple-resizer").resize_up() end },
+        { "<C-Down>", function() require("simple-resizer").resize_down() end },
+      },
+      config = function()
+        require("simple-resizer").setup({
+          keys = false, -- Disable defaults since lazy.nvim handles keys
+        })
+      end,
+    }
+<
+
+==============================================================================
+3. CONFIGURATION                                *simple-resizer-configuration*
+
+The plugin accepts the following configuration options:
+
+    create_commands (boolean, default: true)
+        Create user commands (:ResizeLeft, :ResizeRight, :ResizeUp,
+        :ResizeDown). Set to false if you prefer to use only keybindings
+        or the Lua API.
+
+    keys (table or false, default: Ctrl+Arrow keys)
+        Keybindings configuration. Set to false to disable all default
+        keybindings, or provide a custom table of keybindings.
+
+        Format: Each entry is a table with:
+          [1] = keybinding string (e.g., "<C-Left>")
+          [2] = action (function or command string)
+          desc = optional description
+          mode = optional mode (default: "n")
+
+Default configuration:
+>
+    require("simple-resizer").setup({
+      create_commands = true,
+      keys = {
+        { "<C-Left>", function() require("simple-resizer").resize_left() end,
+          desc = "Resize window left" },
+        { "<C-Right>", function() require("simple-resizer").resize_right() end,
+          desc = "Resize window right" },
+        { "<C-Up>", function() require("simple-resizer").resize_up() end,
+          desc = "Resize window up" },
+        { "<C-Down>", function() require("simple-resizer").resize_down() end,
+          desc = "Resize window down" },
+      },
+    })
+<
+
+Custom keybindings example:
+>
+    require("simple-resizer").setup({
+      keys = {
+        { "<leader>wh", function() require("simple-resizer").resize_left() end,
+          desc = "Resize left" },
+        { "<leader>wl", "<cmd>ResizeRight<cr>", desc = "Resize right" },
+      },
+    })
+<
+
+Disable default keybindings:
+>
+    require("simple-resizer").setup({
+      keys = false,  -- No keybindings
+    })
+<
+
+The resize step is set to 2 lines/columns.
+
+==============================================================================
+4. FUNCTIONS                                        *simple-resizer-functions*
+
+USER COMMANDS ~
+                                                        *:ResizeLeft*
+                                                        *:ResizeRight*
+                                                        *:ResizeUp*
+                                                        *:ResizeDown*
+
+The following commands are created when setup() is called (unless
+`create_commands` is set to false):
+
+    :ResizeLeft     Resize the current window left
+    :ResizeRight    Resize the current window right
+    :ResizeUp       Resize the current window up
+    :ResizeDown     Resize the current window down
+
+LUA API ~
+
+
+                                                    *simple-resizer.resize_left()*
+simple-resizer.resize_left()
+    Resizes the current window leftward. If there's a neighbor to the left,
+    the window grows left. Otherwise, it shrinks from the right.
+
+                                                   *simple-resizer.resize_right()*
+simple-resizer.resize_right()
+    Resizes the current window rightward. If there's a neighbor to the right,
+    the window grows right. Otherwise, it shrinks from the left.
+
+                                                      *simple-resizer.resize_up()*
+simple-resizer.resize_up()
+    Resizes the current window upward. If there's a neighbor above,
+    the window grows up. Otherwise, it shrinks from the bottom.
+
+                                                    *simple-resizer.resize_down()*
+simple-resizer.resize_down()
+    Resizes the current window downward. If there's a neighbor below,
+    the window grows down. Otherwise, it shrinks from the top.
+
+                                                  *simple-resizer.resize_window()*
+simple-resizer.resize_window({win_id}, {direction})
+    Resizes a specific window in the given direction.
+
+    Parameters: ~
+        {win_id}     Window ID to resize. Use 0 for the current window.
+        {direction}  Direction to resize: "up", "down", "left", or "right"
+
+    Example: ~
+>
+        require("simple-resizer").resize_window(0, "left")
+<
+
+                                            *simple-resizer.get_visible_neighbours()*
+simple-resizer.get_visible_neighbours({win_id})
+    Gets the visible neighbors of a given window.
+
+    Parameters: ~
+        {win_id}  The window ID to check. Use 0 for the current window.
+
+    Returns: ~
+        A table with keys "up", "down", "left", "right", each containing
+        a list of neighbor window IDs.
+
+    Example: ~
+>
+        local neighbors = require("simple-resizer").get_visible_neighbours(0)
+        print(vim.inspect(neighbors))
+        -- { up = {1001}, down = {1002}, left = {}, right = {1003} }
+<
+
+                                            *simple-resizer.list_visible_windows()*
+simple-resizer.list_visible_windows()
+    Lists all visible windows in the current tabpage. Prints window IDs
+    and their relative configuration.
+
+    Example: ~
+>
+        require("simple-resizer").list_visible_windows()
+<
+
+==============================================================================
+5. USAGE EXAMPLES                                   *simple-resizer-examples*
+
+Default usage (keybindings are automatic):
+>
+    require("simple-resizer").setup()
+    -- Now you can use Ctrl+Arrow keys to resize windows
+<
+
+Custom keybindings with setup:
+>
+    require("simple-resizer").setup({
+      keys = {
+        { "<leader>wh",
+          function() require("simple-resizer").resize_left() end,
+          desc = "Resize left" },
+        { "<leader>wl",
+          function() require("simple-resizer").resize_right() end,
+          desc = "Resize right" },
+        { "<leader>wk",
+          function() require("simple-resizer").resize_up() end,
+          desc = "Resize up" },
+        { "<leader>wj",
+          function() require("simple-resizer").resize_down() end,
+          desc = "Resize down" },
+      },
+    })
+<
+
+Disable automatic keybindings and set them manually:
+>
+    require("simple-resizer").setup({ keys = false })
+
+    vim.keymap.set('n', '<C-Left>',
+      function() require('simple-resizer').resize_left() end,
+      { desc = 'Resize window left' })
+<
+
+Programmatic usage:
+>
+    local resizer = require('simple-resizer')
+
+    -- Check neighbors before resizing
+    local neighbors = resizer.get_visible_neighbours(0)
+    if #neighbors.left > 0 then
+      resizer.resize_left()
+    end
+<
+
+==============================================================================
+6. LICENSE                                            *simple-resizer-license*
+
+MIT License
+
+vim:tw=78:ts=8:ft=help:norl:
