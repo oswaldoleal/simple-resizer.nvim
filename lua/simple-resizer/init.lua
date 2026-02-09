@@ -81,7 +81,7 @@ function M.resize_window(win_id, direction)
 	end
 
 	local neighbours = M.get_visible_neighbours(target_win_id)
-	local resize_step = 2
+	local resize_step = M.config.resize_step
 	local original_win = vim.api.nvim_get_current_win()
 
 	local function resize(win, cmd)
@@ -172,16 +172,41 @@ end
 
 -- Default keybindings
 local default_keys = {
-	{ "<C-Left>", function() require("simple-resizer").resize_left() end, desc = "Resize window left" },
-	{ "<C-Right>", function() require("simple-resizer").resize_right() end, desc = "Resize window right" },
-	{ "<C-Up>", function() require("simple-resizer").resize_up() end, desc = "Resize window up" },
-	{ "<C-Down>", function() require("simple-resizer").resize_down() end, desc = "Resize window down" },
+	{
+		"<C-Left>",
+		function()
+			require("simple-resizer").resize_left()
+		end,
+		desc = "Resize window left",
+	},
+	{
+		"<C-Right>",
+		function()
+			require("simple-resizer").resize_right()
+		end,
+		desc = "Resize window right",
+	},
+	{
+		"<C-Up>",
+		function()
+			require("simple-resizer").resize_up()
+		end,
+		desc = "Resize window up",
+	},
+	{
+		"<C-Down>",
+		function()
+			require("simple-resizer").resize_down()
+		end,
+		desc = "Resize window down",
+	},
 }
 
 M.config = {
 	-- Default configuration options
 	create_commands = true, -- Set to false to disable user commands
 	keys = default_keys, -- Set to false to disable, or provide custom keybindings
+	resize_step = 2, -- Number of lines/columns to resize by
 }
 
 function M.setup(opts)
@@ -195,21 +220,21 @@ function M.setup(opts)
 
 	-- Create user commands if enabled
 	if M.config.create_commands then
-		vim.api.nvim_create_user_command('ResizeLeft', function()
+		vim.api.nvim_create_user_command("ResizeLeft", function()
 			M.resize_left()
-		end, { desc = 'Resize window left' })
+		end, { desc = "Resize window left" })
 
-		vim.api.nvim_create_user_command('ResizeRight', function()
+		vim.api.nvim_create_user_command("ResizeRight", function()
 			M.resize_right()
-		end, { desc = 'Resize window right' })
+		end, { desc = "Resize window right" })
 
-		vim.api.nvim_create_user_command('ResizeUp', function()
+		vim.api.nvim_create_user_command("ResizeUp", function()
 			M.resize_up()
-		end, { desc = 'Resize window up' })
+		end, { desc = "Resize window up" })
 
-		vim.api.nvim_create_user_command('ResizeDown', function()
+		vim.api.nvim_create_user_command("ResizeDown", function()
 			M.resize_down()
-		end, { desc = 'Resize window down' })
+		end, { desc = "Resize window down" })
 	end
 
 	-- Create keybindings if configured

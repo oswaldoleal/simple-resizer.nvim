@@ -47,6 +47,7 @@ Or with lazy.nvim's lazy-loading on keys:
 ```lua
 require("simple-resizer").setup({
   create_commands = true,  -- Set to false to disable :Resize* commands
+  resize_step = 2,         -- Number of lines/columns to resize by
   keys = {
     -- Default keybindings (Ctrl + Arrow keys)
     { "<C-Left>", function() require("simple-resizer").resize_left() end, desc = "Resize window left" },
@@ -60,6 +61,7 @@ require("simple-resizer").setup({
 ### Options
 
 - `create_commands` (boolean, default: `true`): Create user commands (`:ResizeLeft`, `:ResizeRight`, `:ResizeUp`, `:ResizeDown`). Set to `false` if you prefer to use only keybindings or the Lua API.
+- `resize_step` (number, default: `2`): Number of lines/columns to resize by with each resize operation.
 - `keys` (table or false, default: Ctrl+Arrow keys): Keybindings configuration. Set to `false` to disable all default keybindings, or provide a custom table of keybindings.
 
 ### Custom Keybindings

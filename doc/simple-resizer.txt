@@ -70,6 +70,10 @@ The plugin accepts the following configuration options:
         :ResizeDown). Set to false if you prefer to use only keybindings
         or the Lua API.
 
+    resize_step (number, default: 2)
+        Number of lines/columns to resize by with each resize operation.
+        Increase for larger resize steps, decrease for finer control.
+
     keys (table or false, default: Ctrl+Arrow keys)
         Keybindings configuration. Set to false to disable all default
         keybindings, or provide a custom table of keybindings.
@@ -84,6 +88,7 @@ Default configuration:
 >
     require("simple-resizer").setup({
       create_commands = true,
+      resize_step = 2,
       keys = {
         { "<C-Left>", function() require("simple-resizer").resize_left() end,
           desc = "Resize window left" },
@@ -115,7 +120,12 @@ Disable default keybindings:
     })
 <
 
-The resize step is set to 2 lines/columns.
+Custom resize step:
+>
+    require("simple-resizer").setup({
+      resize_step = 5,  -- Resize by 5 lines/columns instead of 2
+    })
+<
 
 ==============================================================================
 4. FUNCTIONS                                        *simple-resizer-functions*
